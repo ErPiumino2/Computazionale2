@@ -20,13 +20,13 @@ int main(int argc, char **argv){
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 void RW(int argc, char **argv){
-    double x2mean=0, x2error=0;
+    double x2mean=0;
     randn min=1, max=2, x, r;
     struct RandomParameters RP;
-    iterator nmax, n, i, dn, iterations;
+    iterator nmax, n, i, dn, iterations, j;
     FILE *fp;
     if(argc !=4){
-		printf("\nInput must be: x0(starting point), tmax(total time of integration), k(number of total RW for x(t)^2, must be tmax%k==0)\n");
+		printf("\nInput must be: x0(starting point), tmax(total time of integration), k(number of total RW for x(t)^2, must be a multiple)\n");
 		exit(1);
 	}
     nmax = atoi(argv[2]);
@@ -37,22 +37,21 @@ void RW(int argc, char **argv){
     }
     RP.seed = time(NULL);
     dn = nmax/iterations;
+    n=nmax;
     fp = fopen("/workspaces/Computazionale2/Lab5/File/<x2>.dat", "w+");
-    for(n=0; n<=nmax; n+=dn){
+    for(j=0; j<=nmax; j++){
+        x2mean=0;
         r = atoi(argv[1]);
-        x2mean = 0;
-        x2error = 0;
-        for(i=0; i<n; i++){
+        for(i=0; i<nmax; i++){
             x = Random(&RP);
             x = min + (x % (max - min + 1)); //Get x within range
             if(x==1){ //Going right
                 r += 1;}
             if(x==2){ //Going left
                 r -= 1;}
-            x2mean += x*x;
-            x2error += x*x*x*x;
+            x2mean += r*r;
         }
-        fprintf(fp, "%.2lf \t %.2lf \t %i\n", x2mean/iterations, x2error/iterations, n);
+        fprintf(fp, "%.2lf \t %i\n", x2mean/nmax, j+1);
     }
     fclose(fp);
 }
