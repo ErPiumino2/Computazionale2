@@ -20,10 +20,10 @@ int main(int argc, char **argv){
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 void RW(int argc, char **argv){
-    double x2mean=0;
-    randn min=1, max=2, x, r;
+    int r;
+    randn min=1, max=2, x;
     struct RandomParameters RP;
-    iterator nmax, n, i, dn, iterations, j;
+    iterator nmax, dn, iterations;
     FILE *fp;
     if(argc !=4){
 		printf("\nInput must be: x0(starting point), tmax(total time of integration), k(number of total RW for x(t)^2, must be a multiple)\n");
@@ -31,27 +31,29 @@ void RW(int argc, char **argv){
 	}
     nmax = atoi(argv[2]);
     iterations = atoi(argv[3]);
+    int *av=(int*)calloc(nmax, sizeof(int)); //To store average position
+    int *av1=(int*)calloc(nmax, sizeof(int)); 
     if((nmax%iterations)!=0 || nmax<iterations){
         printf("\nError, number of iterations must be an int, not a float...\n");
         exit(1);
     }
     RP.seed = time(NULL);
-    dn = nmax/iterations;
-    n=nmax;
     fp = fopen("/workspaces/Computazionale2/Lab5/File/<x2>.dat", "w+");
-    for(j=0; j<=nmax; j++){
-        x2mean=0;
+    for(int j=0; j<=nmax; j++){
         r = atoi(argv[1]);
-        for(i=0; i<nmax; i++){
+        for(int i=0; i<nmax; i++){
             x = Random(&RP);
             x = min + (x % (max - min + 1)); //Get x within range
             if(x==1){ //Going right
                 r += 1;}
             if(x==2){ //Going left
                 r -= 1;}
-            x2mean += r*r;
+            av[i] += r*r;
+            av1[i] += r*r*r*r;
         }
-        fprintf(fp, "%.2lf \t %i\n", x2mean/nmax, j+1);
+    }
+    for(int i=0; i<nmax; i++){
+        fprintf(fp, "%.2lf \t %.2lf \t %i\n", av[i]/(double)nmax, av1[i]/(double)(nmax), i);
     }
     fclose(fp);
 }
