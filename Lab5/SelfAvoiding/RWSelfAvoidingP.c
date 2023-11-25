@@ -1,4 +1,4 @@
-//2D self avoiding random walk
+//2D self avoiding random walk, probability of being trapped
 #include<stdlib.h>
 #include<stdio.h>
 #include<math.h>
@@ -25,64 +25,67 @@ int main(int argc, char **argv){
 void RW(int argc, char **argv){
     randn p;
     struct RandomParameters RP;
-    iterator nmax;
+    iterator nmax=1, nmaxtot, tcount;
     FILE *fp;
     if(argc !=4){
 		printf("\nInput must be: x0(starting point), y0(starting point), nmax(total number of steps)\n");
 		exit(1);
 	}
-    nmax = atoi(argv[3]);
-        //////////////////Creating 2dimensional array using calloc//////////////////
-    int **position=(int**)calloc(nmax, sizeof(int*)); 
-    for(int i=0; i<nmax; i++) {
-        position[i] = (int *) calloc(2, sizeof(int));
-    }
-    ////////////////////////////////////////////////////////////////////////////
-    for(int k=0; k<10000; k++){
-        int n=1;
-        position[0][0] = atoi(argv[1]);
-        position[0][1] = atoi(argv[2]);
-        RP.seed = time(NULL);
-        fp = fopen("/workspaces/Computazionale2/Lab5/File/SelfAvoidingSteps.dat", "w+");
-        while(n<nmax){
-            //Check if the starting position of every cycle is trapped
-            if(Trapped(position, n-1)==1){
-                    printf("Trapped at %i \t\t %i \t\t %i\n", position[n-1][0], position[n-1][1], n-1);
-                    fprintf(fp, "%i \t\t %i \t\t %i\n", position[n-1][0], position[n-1][1], n-1);
-                    exit(1); //Exit the loop if trapped
+    RP.seed = time(NULL);
+    nmaxtot = atoi(argv[3]);
+    fp = fopen("/workspaces/Computazionale2/Lab5/File/SelfAvoidingP.dat", "w+");
+    while(nmax<nmaxtot){
+        tcount=0;
+        for(int k=0; k<5000; k++){
+            /////////////////Creating 2dimensional array using calloc//////////////////
+            int **position=(int**)calloc(nmax, sizeof(int*)); 
+            for(int i=0; i<nmax; i++) {
+                position[i] = (int *) calloc(2, sizeof(int));
             }
-            p = (Random(&RP) % 4 + 4) % 4 + 1; //x will be in the range [1, 4]
-            int dx=0, dy=0;
-            // Move in the chosen direction
-            switch (p) {
-                case 1: // Up
-                    dy = -1;
-                    break;
-                case 2: // Down
-                    dy = 1;
-                    break;
-                case 3: // Left
-                    dx = -1;
-                    break;
-                case 4: // Right
-                    dx = 1;
-                    break;
+            ////////////////////////////////////////////////////////////////////////////
+            int n=1;
+            position[0][0] = atoi(argv[1]);
+            position[0][1] = atoi(argv[2]);
+            while(n<nmax){
+                //Check if the starting position of every cycle is trapped
+                if(Trapped(position, n-1)==1){
+                        tcount ++;
+                        break;
+                }
+                p = (Random(&RP) % 4 + 4) % 4 + 1; //x will be in the range [1, 4]
+                int dx=0, dy=0;
+                // Move in the chosen direction
+                switch (p) {
+                    case 1: // Up
+                        dy = -1;
+                        break;
+                    case 2: // Down
+                        dy = 1;
+                        break;
+                    case 3: // Left
+                        dx = -1;
+                        break;
+                    case 4: // Right
+                        dx = 1;
+                        break;
+                }
+                // Check if the new position has already been visited
+                if(Check(position, position[n-1][0]+dx, position[n-1][1]+dy, n) == 0){
+                    position[n][0] = position[n-1][0] + dx;
+                    position[n][1] = position[n-1][1] + dy;
+                    n++;
+                }
             }
-            // Check if the new position has already been visited
-            if(Check(position, position[n-1][0]+dx, position[n-1][1]+dy, n) == 0){
-                position[n][0] = position[n-1][0] + dx;
-                position[n][1] = position[n-1][1] + dy;
-                fprintf(fp, "%i \t\t %i \t\t %i\n", position[n-1][0], position[n-1][1], n-1);
-                n++;
+            //Free the allocated memory
+            for (int i = 0; i < nmax; i++) {
+                free(position[i]);
             }
-        }
-        fclose(fp);
+            free(position);
     }
-    //Free the allocated memory
-    for (int i = 0; i < nmax; i++) {
-        free(position[i]);
+    fprintf(fp, "%i \t %i\n", tcount, nmax);
+    nmax += 1;
     }
-    free(position);
+    fclose(fp);
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
