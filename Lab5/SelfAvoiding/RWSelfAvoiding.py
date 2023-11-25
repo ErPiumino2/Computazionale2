@@ -1,35 +1,29 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
-
+from matplotlib.ticker import MultipleLocator
+fig, ax = plt.subplots(3,2)
 fig.set_figwidth(20)
 fig.set_figheight(20)
-fig.suptitle('Random Walk for various number of steps', fontsize=20)
-x1, y1 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/RW2Dn=10.dat', usecols=(0, 1), unpack=True)
-x2, y2 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/RW2Dn=60.dat', usecols=(0, 1), unpack=True)
-x3, y3 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/RW2Dn=360.dat', usecols=(0, 1), unpack=True)
-x4, y4 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/RW2Dn=2160.dat', usecols=(0, 1), unpack=True)
-x5, y5 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/RW2Dn=12960.dat', usecols=(0, 1), unpack=True)
-x6, y6 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/RW2Dn=77760.dat', usecols=(0, 1), unpack=True)
+fig.suptitle('Self Avoiding Random Walk for various number of steps', fontsize=20)
+x1, y1 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/SelfAvoidingn=10.dat', usecols=(0, 1), unpack=True)
+x2, y2 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/SelfAvoidingn=50.dat', usecols=(0, 1), unpack=True)
+x3, y3 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/SelfAvoidingn=250.dat', usecols=(0, 1), unpack=True)
+x4, y4 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/SelfAvoidingn=1250.dat', usecols=(0, 1), unpack=True)
+x5, y5 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/SelfAvoidingn=6250.dat', usecols=(0, 1), unpack=True)
+x6, y6 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/SelfAvoidingn=31250.dat', usecols=(0, 1), unpack=True)
 N1 = len(x1)
 N2 = len(x2)
 N3 = len(x3)
 N4 = len(x4)
 N5 = len(x5)
 N6 = len(x6)
-meanx1, meany1, stdx1, stdy1 = np.loadtxt("/workspaces/Computazionale2/Lab5/File/MuStdn=10.dat", usecols=(0, 1, 2, 3), unpack=True)
-meanx2, meany2, stdx2, stdy2 = np.loadtxt("/workspaces/Computazionale2/Lab5/File/MuStdn=60.dat", usecols=(0, 1, 2, 3), unpack=True)
-meanx3, meany3, stdx3, stdy3 = np.loadtxt("/workspaces/Computazionale2/Lab5/File/MuStdn=360.dat", usecols=(0, 1, 2, 3), unpack=True)
-meanx4, meany4, stdx4, stdy4 = np.loadtxt("/workspaces/Computazionale2/Lab5/File/MuStdn=2160.dat", usecols=(0, 1, 2, 3), unpack=True)
-meanx5, meany5, stdx5, stdy5 = np.loadtxt("/workspaces/Computazionale2/Lab5/File/MuStdn=12960.dat", usecols=(0, 1, 2, 3), unpack=True)
-meanx6, meany6, stdx6, stdy6 = np.loadtxt("/workspaces/Computazionale2/Lab5/File/MuStdn=77760.dat", usecols=(0, 1, 2, 3), unpack=True)
 #Vari plot
-f1 = ax[0,0].plot(x1, y1, color='skyblue', label=f'Random Walk {N1-1:.0f} steps',  zorder=-1)
-f2 = ax[0,1].plot(x2, y2, color='skyblue', label=f'Random Walk {N2-1:.0f} steps',  zorder=-1)
-f3 = ax[1,0].plot(x3, y3, color='skyblue', label=f'Random Walk {N3-1:.0f} steps',  zorder=-1)
-f4 = ax[1,1].plot(x4, y4, color='skyblue', label=f'Random Walk {N4-1:.0f} steps',  zorder=-1)
-f5 = ax[2,0].plot(x5, y5, color='skyblue', label=f'Random Walk {N5-1:.0f} steps',  zorder=-1)
-f6 = ax[2,1].plot(x6, y6, color='skyblue', label=f'Random Walk {N6-1:.0f} steps',  zorder=-1)
+ax[0,0].plot(x1, y1, color='skyblue', label=f'Random Walk 10 steps',  zorder=-1, linewidth=3)
+ax[0,1].plot(x2, y2, color='skyblue', label=f'Random Walk 50 steps',  zorder=-1, linewidth=3)
+ax[1,0].plot(x3, y3, color='skyblue', label=f'Random Walk 250 steps',  zorder=-1, linewidth=3)
+ax[1,1].plot(x4, y4, color='skyblue', label=f'Random Walk 1250 steps',  zorder=-1, linewidth=3)
+ax[2,0].plot(x5, y5, color='skyblue', label=f'Random Walk 6250 steps',  zorder=-1, linewidth=3)
+ax[2,1].plot(x6, y6, color='skyblue', label=f'Random Walk 31250 steps',  zorder=-1, linewidth=3)
 #Initial Points plots
 ax[0,0].scatter(x1[0], y1[0], color='red', label=f'Starting Point: ({x1[0]:.0f}, {y1[0]:.0f})',  zorder=1)
 ax[0,1].scatter(x2[0], y2[0], color='red', label=f'Starting Point: ({x2[0]:.0f}, {y2[0]:.0f})',  zorder=1)
@@ -45,24 +39,19 @@ ax[1,1].scatter(x4[-1], y4[-1], color='darkslategrey', label=f'Final Point:  ({x
 ax[2,0].scatter(x5[-1], y5[-1], color='darkslategrey', label=f'Final Point:  ({x5[-1]:.0f}, {y5[-1]:.0f})', zorder=1)
 ax[2,1].scatter(x6[-1], y6[-1], color='darkslategrey', label=f'Final Point:  ({x6[-1]:.0f}, {y6[-1]:.0f})', zorder=1)
 #Empty plots
-ax[0,0].plot([], [], '', label=f'Mean (x,y): ({meanx1:.2f}, {meany1:.2f})', alpha=0)
-ax[0,0].plot([], [], '', label=f'Std (x,y): ({stdx1:.2f}, {stdy1:.2f})', alpha=0)
-
-ax[0,1].plot([], [], '', label=f'Mean (x,y): ({meanx2:.2f}, {meany2:.2f})', alpha=0)
-ax[0,1].plot([], [], '', label=f'Std (x,y): ({stdx2:.2f}, {stdy2:.2f})', alpha=0)
-
-ax[1,0].plot([], [], '', label=f'Mean (x,y): ({meanx3:.2f}, {meany3:.2f})', alpha=0)
-ax[1,0].plot([], [], '', label=f'Std (x,y): ({stdx3:.2f}, {stdy3:.2f})', alpha=0)
-
-ax[1,1].plot([], [], '', label=f'Mean (x,y): ({meanx4:.2f}, {meany4:.2f})', alpha=0)
-ax[1,1].plot([], [], '', label=f'Std (x,y): ({stdx4:.2f}, {stdy4:.2f})', alpha=0)
-
-ax[2,0].plot([], [], '', label=f'Mean (x,y): ({meanx5:.2f}, {meany5:.2f})', alpha=0)
-ax[2,0].plot([], [], '', label=f'Std (x,y): ({stdx5:.2f}, {stdy5:.2f})', alpha=0)
-
-ax[2,1].plot([], [], '', label=f'Mean (x,y): ({meanx6:.2f}, {meany6:.2f})', alpha=0)
-ax[2,1].plot([], [], '', label=f'Std (x,y): ({stdx6:.2f}, {stdy6:.2f})', alpha=0)
+ax[1,0].plot([], [], '', label=f'Trapped at: ({x3[-1]:.0f}, {y3[-1]:.0f})', zorder=1, alpha=0)
+ax[1,1].plot([], [], '', label=f'Trapped at: ({x4[-1]:.0f}, {y4[-1]:.0f})', zorder=1, alpha=0)
+ax[2,0].plot([], [], '', label=f'Trapped at: ({x5[-1]:.0f}, {y5[-1]:.0f})', zorder=1, alpha=0)
+ax[2,1].plot([], [], '', label=f'Trapped at: ({x6[-1]:.0f}, {y6[-1]:.0f})', zorder=1, alpha=0)
 for ax in ax.flat:
     ax.legend(fontsize=10)
     ax.set(xlabel='x', ylabel='y')
-plt.savefig("RandomWalk2D.png")
+    ax.xaxis.set_major_locator(MultipleLocator(1))
+    ax.yaxis.set_major_locator(MultipleLocator(1))
+    ax.xaxis.set_minor_locator(MultipleLocator(0.5))
+    ax.yaxis.set_minor_locator(MultipleLocator(0.5))
+    # Vari plot
+    ax.grid(which='major', color='#DDDDDD', linewidth=0.8, zorder=-2)
+    ax.grid(which='minor', color='#EEEEEE', linestyle=':', linewidth=0.5, zorder=-2)
+    ax.minorticks_on()
+plt.savefig('SelfAvoiding.png')
