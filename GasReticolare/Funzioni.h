@@ -7,16 +7,14 @@ typedef struct RandomParameters{
     unsigned long int n;
     unsigned long int seed;
 }RP;
+typedef struct Position{
+    int x;
+    int y;
+}Pos;
 
 double INVRANDMAX=1/(RAND_MAX + 1.);
-
-int Random(RP *RP, int min, int max);//To generate random int values
-double randrange(double a, double b);//Better to use this one
-void* array(int N, int size);
-int** matrix(int L);
-void immission_error();
-void particles(int** reticolo, double ro, int L, int N);
-void printmatrix(int** reticolo, int L);
+void particleposition(int** matrix, Pos* array, int L, int N);
+int Check(int** reticolo, int x, int y, int L);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,11 +37,12 @@ double randrange(double a, double b){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void* array(int N, int size){
     //Like calloc, but raises an error if fails to allocate
-    void* ptr = calloc(N, size);
-    if (ptr == NULL){
+    void* array = calloc(N, size);
+    if (array == NULL){
         fprintf(stderr, "Memory Error: allocation failed\n");
         exit(2);
     }
+    return array;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,29 +62,87 @@ void immission_error(){
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void particles(int** reticolo, double ro, int L, int N){
-    int n=0;
-    while(n<N){
+void spawn(int** reticolo, Pos *array, int L, int N){
+    int n=1;
+    while(n<=N){
         int x = randrange(0, L);
         int y = randrange(0, L);
         if(reticolo[x][y]==0){
-            reticolo[x][y] = 1;
-            n++;
+            reticolo[x][y] = n++;
         }
     }
+    particleposition(reticolo, array, L, N);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void printmatrix(int** reticolo, int L){
     for(int i=0; i<L; i++){
         for(int j=0; j<L; j++){
-            printf("%i ", reticolo[i][j]);
+            printf("%i\t", reticolo[i][j]);
         }
         printf("\n");
+    }
+    printf("\n");
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void printarray(Pos *array, int N){
+    //Print nicely the array of positions for debug purposes
+    for (int i=0; i<N; i++){
+        printf("%i: \t%ix %iy", i+1, array[i].x, array[i].y);
+        printf("\n");
+    }
+    printf("\n");
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void move(int** reticolo, Pos* array, int N, int L){
+    RP d;
+    int i=0, dy;
+    while(i<N){
+        int dx = Random(&d, 0, 1);
+        if(dx==0){dy = 1;}
+        else{dy = 0;}
+        if(Check(reticolo, array[i].y-1+dy, array[i].x-1+dx, L)==1){
+            reticolo[array[i].y-1][array[i].x-1] = 0;
+            array[i].x += dx;
+            array[i].y += dy;
+            reticolo[array[i].y-1][array[i].x-1] = i+1;
+            i++;
+        }
+        //Trapped Situation
+        else if(
+            Check(reticolo, array[i].y-1+1, array[i].x-1+0, L)==0 &&
+            Check(reticolo, array[i].y-1-1, array[i].x-1+0, L)==0 &&
+            Check(reticolo, array[i].y-1+0, array[i].x-1+1, L)==0 &&
+            Check(reticolo, array[i].y-1+0, array[i].x-1-1, L)==0 
+        ){
+            printf("\n%i e' intrappolato\n\n", i+1);
+            i++;
+        }
     }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void move(int** reticolo){
-
+void particleposition(int** matrix, Pos* array, int L, int N){
+    //Sync the array of positions with the matrix
+    for (int i=0; i<L; i++){
+        for(int j=0; j<L; j++){
+            int p = matrix[i][j];
+            if (p != 0){
+                array[p-1].x = j+1;
+                array[p-1].y = i+1;
+            }
+        }
+    }
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int Check(int** reticolo, int x, int y, int L){
+    if(x<L && y<L && x>0 && y>0 && reticolo[x][y]==0){
+        return 1;
+    }
+    else{
+        return 0;
+    }
 }
