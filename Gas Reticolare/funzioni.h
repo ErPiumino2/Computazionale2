@@ -46,7 +46,7 @@ double randrange(double a, double b){
 int randbool(double p){
     // Generate a random number either 0 or 1
     // with probability p that it is 1
-    return rand()*INVRANDMAX < p;
+    return rand()*INVRANDMAX < p; 
 }
 
 double mod(double x, double m){
