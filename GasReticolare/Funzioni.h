@@ -3,10 +3,6 @@
 #include<math.h>
 #include<time.h>
 
-typedef struct RandomParameters{
-    unsigned long int n;
-    unsigned long int seed;
-}RP;
 typedef struct Position{
     int x;
     int y;
@@ -15,18 +11,8 @@ typedef struct Position{
 double INVRANDMAX=1/(RAND_MAX + 1.);
 void particleposition(int** matrix, Pos* array, int L, int N);
 int Check(int** reticolo, int x, int y, int L);
+double mod(double x, double m);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-int Random(RP *RP, int min, int max){
-    unsigned long int a=pow(5,5), c=pow(7,5), m=1944674407370955169; //a:constant multiplier, c:increment, m:modulus
-
-	RP->n =(a*(RP->seed) + c) % m; //Generate random
-    RP->seed = RP->n; //Update seed
-    RP->n = min + (RP->n % (max - min + 1)); //Get number within range
-    return RP->n;
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 double randrange(double a, double b){
@@ -96,29 +82,60 @@ void printarray(Pos *array, int N){
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void move(int** reticolo, Pos* array, int N, int L){
-    RP d;
-    int i=0, dy;
+void move(int** reticolo, Pos* array, int* distanzaparticelle, int N, int L){
+    int i=0;
+    Pos delta, newpos;
     while(i<N){
-        int dx = Random(&d, 0, 1);
-        if(dx==0){dy = 1;}
-        else{dy = 0;}
-        if(Check(reticolo, array[i].y-1+dy, array[i].x-1+dx, L)==1){
-            reticolo[array[i].y-1][array[i].x-1] = 0;
-            array[i].x += dx;
-            array[i].y += dy;
-            reticolo[array[i].y-1][array[i].x-1] = i+1;
-            i++;
-        }
+        //Initializing the variables as a safety check
+        delta.x = 0;
+        delta.y = 0;
+        newpos.x = 0;
+        newpos.y = 0;
         //Trapped Situation
-        else if(
-            Check(reticolo, array[i].y-1+1, array[i].x-1+0, L)==0 &&
-            Check(reticolo, array[i].y-1-1, array[i].x-1+0, L)==0 &&
-            Check(reticolo, array[i].y-1+0, array[i].x-1+1, L)==0 &&
-            Check(reticolo, array[i].y-1+0, array[i].x-1-1, L)==0 
+        if(
+            Check(reticolo, array[i].x+1, array[i].y, L)==0 &&
+            Check(reticolo, array[i].x-1, array[i].y, L)==0 &&
+            Check(reticolo, array[i].x, array[i].y+1, L)==0 &&
+            Check(reticolo, array[i].x, array[i].y-1, L)==0 
         ){
-            printf("\n%i e' intrappolato\n\n", i+1);
+            i++; //Skip to next number, this won't move
+            continue;
+        }
+        int r = (rand()%4) + 1; //Generate number within [1;4]
+        switch (r){
+        case (1):
+            delta.x = 1;
+            delta.y = 0;
+            break;
+        case (2):
+            delta.x = -1;
+            delta.y = 0;
+            break;
+        case (3):
+            delta.x = 0;
+            delta.y = 1;
+            break;
+        case (4):
+            delta.x = 0;
+            delta.y = -1;
+            break;
+        }
+        newpos.y = mod(array[i].y+delta.y, L);
+        newpos.x = mod(array[i].x+delta.x, L);
+        if(Check(reticolo, newpos.x, newpos.y, L)==1){
+            reticolo[array[i].y][array[i].x] = 0; //Freeing the spot early occupied by the particle
+            array[i].x = newpos.x; //Updating positions
+            array[i].y = newpos.y;
+            reticolo[newpos.y][newpos.x] = i+1; //Occuping the actual spot of the particle
+            distanza[i].x += delta.x;
+            distanza[i].y += delta.y;
             i++;
+            if(i>N){
+                break;
+            }
+        }
+        else{
+            continue;
         }
     }
 }
@@ -130,8 +147,8 @@ void particleposition(int** matrix, Pos* array, int L, int N){
         for(int j=0; j<L; j++){
             int p = matrix[i][j];
             if (p != 0){
-                array[p-1].x = j+1;
-                array[p-1].y = i+1;
+                array[p-1].x = j;
+                array[p-1].y = i;
             }
         }
     }
@@ -139,10 +156,37 @@ void particleposition(int** matrix, Pos* array, int L, int N){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int Check(int** reticolo, int x, int y, int L){
-    if(x<L && y<L && x>0 && y>0 && reticolo[x][y]==0){
+    if(x<0 || x>L-1 || y<0 || y>L-1){
+        return 0; //To exlcude segmentation fault, not a problem since the mod function will take care of it
+    }
+    if(reticolo[y][x]==0){
         return 1;
     }
     else{
         return 0;
     }
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void Density(int** reticolo, Pos* particelle, Pos* distanzaparticelle, int Nsim, int L, int N){
+    for(int i=0; i<Nsim; i++){
+        move(reticolo, particelle, distanzaparticelle, N, L);
+    }
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+double R2(Pos *distanzaparticelle, int N){
+    //Calculate the average R^2 where R is the distance from the starting
+    //Point of every particle.
+    double res = 0;
+    for (int i=0; i<N; i++){
+        res += distanzaparticelle[i].x*distanzaparticelle[i].x + distanzaparticelle[i].y*distanzaparticelle[i].y;
+    }
+    return res/N;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+double mod(double x, double m){
+    //Compute x mod. m. Result is in [0,m)
+    return fmod(fmod(x, m) + m, m);
 }
