@@ -42,7 +42,7 @@ void RW(int argc, char **argv){
         r.x = atoi(argv[1]); //Initial position
         r.y = atoi(argv[2]); //Initial position
         char NomeFile[60];
-        sprintf(NomeFile, "/workspaces/Computazionale2/Lab5/File/RW2DHiston=%i.dat", n);
+        sprintf(NomeFile, "/workspaces/Computazionale2/RandomWalk/File/RW2DHiston=%i.dat", n);
         fp = fopen(NomeFile, "w+");
         for(k=0; k<ktot; k++){ //Doing ktot different random walks 
             r.x = atoi(argv[1]); //Initial position

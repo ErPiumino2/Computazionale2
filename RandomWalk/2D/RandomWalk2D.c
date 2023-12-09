@@ -51,8 +51,8 @@ void RW(int argc, char **argv){
         sum.y = 0;
         char NomeFile[60];
         char NomeFile1[60];
-        sprintf(NomeFile, "/workspaces/Computazionale2/Lab5/File/RW2Dn=%i.dat", n);
-        sprintf(NomeFile1, "/workspaces/Computazionale2/Lab5/File/MuStdn=%i.dat", n);
+        sprintf(NomeFile, "/workspaces/Computazionale2/RandomWalk/File/RW2Dn=%i.dat", n);
+        sprintf(NomeFile1, "/workspaces/Computazionale2/RandomWalk/File/MuStdn=%i.dat", n);
         fp = fopen(NomeFile, "w+");
         fp1 = fopen(NomeFile1, "w+");
         fprintf(fp, "%i \t %i\n", r.x, r.y);

@@ -43,7 +43,7 @@ void RW(int argc, char **argv){
     for(int k=0; k<6; k++){ //based on n, increasing each time
         r = atoi(argv[1]); //Initial position, has to be initialized
         char NomeFile[60];
-        sprintf(NomeFile, "/workspaces/Computazionale2/Lab5/File/RWTrapn=%ip=%.2lf.dat", n, P.p);
+        sprintf(NomeFile, "/workspaces/Computazionale2/RandomWalk/File/RWTrapn=%ip=%.2lf.dat", n, P.p);
         fp = fopen(NomeFile, "w+");
         fprintf(fp, "%i \t %i\n", r, 0);
         for(int i=0; i<n; i++){

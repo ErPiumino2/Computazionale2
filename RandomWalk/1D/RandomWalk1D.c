@@ -41,9 +41,9 @@ void RW(int argc, char **argv){
         char NomeFile[60];
         char NomeFile1[60];
         char NomeFile2[60];
-        sprintf(NomeFile, "/workspaces/Computazionale2/Lab5/File/RW1Dn=%i.dat", n);
-        sprintf(NomeFile1, "/workspaces/Computazionale2/Lab5/File/1DMuStdn=%i.dat", n);
-        sprintf(NomeFile2, "/workspaces/Computazionale2/Lab5/File/RW1DHiston=%i.dat", n);
+        sprintf(NomeFile, "/workspaces/Computazionale2/RandomWalk/File/RW1Dn=%i.dat", n);
+        sprintf(NomeFile1, "/workspaces/Computazionale2/RandomWalk/File/1DMuStdn=%i.dat", n);
+        sprintf(NomeFile2, "/workspaces/Computazionale2/RandomWalk/File/RW1DHiston=%i.dat", n);
         fp = fopen(NomeFile, "w+");
         fp1 = fopen(NomeFile1, "w+");
         fp2 = fopen(NomeFile2, "w+");

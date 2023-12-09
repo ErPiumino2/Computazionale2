@@ -46,7 +46,7 @@ void RW(int argc, char **argv){
         position[0][0] = atoi(argv[1]);
         position[0][1] = atoi(argv[2]);
         char NomeFile[70];
-        sprintf(NomeFile, "/workspaces/Computazionale2/Lab5/File/SelfAvoidingn=%i.dat", nmax-2);
+        sprintf(NomeFile, "/workspaces/Computazionale2/RandomWalk/File/SelfAvoidingn=%i.dat", nmax-2);
         fp = fopen(NomeFile, "w+");
         while(n<nmax){
             //Check if the starting position of every cycle is trapped

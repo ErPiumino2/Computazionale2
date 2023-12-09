@@ -10,13 +10,9 @@ struct RandomParameters{
     randn seed;
     randn n; //Number Generated
 };
-struct Probability{
-    double p;
-    double q;//q=1-p
-};
 
 void RW(int argc, char **argv);
-int Random(struct RandomParameters *RP, struct Probability *P);
+int Random(struct RandomParameters *RP);
 
 int main(int argc, char **argv){
     RW(argc, argv);
@@ -24,14 +20,13 @@ int main(int argc, char **argv){
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 void RW(int argc, char **argv){
-    randn x;
+    int r;
+    randn min=1, max=2, x;
     struct RandomParameters RP;
-    struct Probability P;
-    int r; //r equal position
-    iterator nmax, iterations;
+    iterator nmax, dn, iterations;
     FILE *fp;
-    if(argc !=5){
-		printf("\nInput must be: x0(starting point), nmax(max number of steps), k(number of iterations, multiple of nmax), p(probability of going right, where p in [0;1])\n");
+    if(argc !=4){
+		printf("\nInput must be: x0(starting point), tmax(total time of integration), k(number of total RW for x(t)^2, must be a multiple)\n");
 		exit(1);
 	}
     nmax = atoi(argv[2]);
@@ -43,21 +38,16 @@ void RW(int argc, char **argv){
         exit(1);
     }
     RP.seed = time(NULL);
-    fp = fopen("/workspaces/Computazionale2/Lab5/File/RWTrapx2.dat", "w+");
+    fp = fopen("/workspaces/Computazionale2/RandomWalk/File/<x2>.dat", "w+");
     for(int j=0; j<=nmax; j++){
         r = atoi(argv[1]);
-        P.p = atof(argv[4]);
-        P.q = 1-P.p;
         for(int i=0; i<nmax; i++){
-            x = Random(&RP, &P);
-            switch (x){
-            case 1:
-                r ++; //Going right
-                break;
-            case 2:
-                r --; //Going left
-                break;
-            }
+            x = Random(&RP);
+            x = min + (x % (max - min + 1)); //Get x within range
+            if(x==1){ //Going right
+                r += 1;}
+            if(x==2){ //Going left
+                r -= 1;}
             av[i] += r*r;
             av1[i] += r*r*r*r;
         }
@@ -69,19 +59,10 @@ void RW(int argc, char **argv){
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
-int Random(struct RandomParameters *RP, struct Probability *P){
-    randn a=pow(5,5), c=pow(7,5), m=1944674407370955169, x; //a:constant multiplier, c:increment, m:modulus
+int Random(struct RandomParameters *RP){
+    randn a=pow(5,5), c=pow(7,5), m=1944674407370955169; //a:constant multiplier, c:increment, m:modulus
 
 	RP->n =(a*(RP->seed) + c) % m; //Generate random
     RP->seed = RP->n; //Update seed
-    double randomValue = (double)RP->n / m; //Convert RP->n to a value between 0 and 1
-    if (randomValue < P->p) {//Check if the random number falls within the desired probability
-        x = 1; //Probability of going right
-    } else {
-        x = 2; //Probability of going left, 1-p
-    }
-    double temp = P->p;
-    P->p = P->q;
-    P->q = temp;
-    return x;
+    return RP->n;
 }

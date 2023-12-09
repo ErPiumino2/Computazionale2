@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include<math.h>
 #include<time.h>
+#define M_PI 3.14159265358979323846264338327950288419716939937510
 
 typedef int iterator;
 typedef unsigned long int randn;
@@ -20,40 +21,30 @@ int main(int argc, char **argv){
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
 void RW(int argc, char **argv){
-    int r;
     randn min=1, max=2, x;
     struct RandomParameters RP;
-    iterator nmax, dn, iterations;
     FILE *fp;
     if(argc !=4){
-		printf("\nInput must be: x0(starting point), tmax(total time of integration), k(number of total RW for x(t)^2, must be a multiple)\n");
+		printf("\nInput must be: x0(starting point), tmax(total time of integration), Nsim(number of total RW)\n");
 		exit(1);
 	}
-    nmax = atoi(argv[2]);
-    iterations = atoi(argv[3]);
-    int *av=(int*)calloc(nmax, sizeof(int)); //To store average position
-    int *av1=(int*)calloc(nmax, sizeof(int)); 
-    if((nmax%iterations)!=0 || nmax<iterations){
-        printf("\nError, number of iterations must be an int, not a float...\n");
-        exit(1);
-    }
+    int nmax = atoi(argv[2]);
+    int Nsim = atoi(argv[3]);
     RP.seed = time(NULL);
-    fp = fopen("/workspaces/Computazionale2/Lab5/File/<x2>.dat", "w+");
-    for(int j=0; j<=nmax; j++){
-        r = atoi(argv[1]);
+    char NomeFile[70];
+    sprintf(NomeFile, "/workspaces/Computazionale2/RandomWalk/File/RW1DPt=%i.dat", nmax);
+    fp = fopen(NomeFile, "w+");
+    for(int j=0; j<Nsim; j++){
+        int r = atoi(argv[1]);
         for(int i=0; i<nmax; i++){
-            x = Random(&RP);
-            x = min + (x % (max - min + 1)); //Get x within range
+            x = min + (Random(&RP)  % (max - min + 1)); //Get x within range
             if(x==1){ //Going right
                 r += 1;}
             if(x==2){ //Going left
                 r -= 1;}
-            av[i] += r*r;
-            av1[i] += r*r*r*r;
         }
-    }
-    for(int i=0; i<nmax; i++){
-        fprintf(fp, "%.2lf \t %.2lf \t %i\n", av[i]/(double)nmax, av1[i]/(double)(nmax), i);
+        double p = sqrt(1/(M_PI*Nsim))*exp(-((double)(r*r)) / (Nsim*1*1));
+        fprintf(fp, "%i %.5lf\n", r, p);
     }
     fclose(fp);
 }

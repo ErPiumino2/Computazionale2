@@ -33,7 +33,7 @@ void RW(int argc, char **argv){
 	}
     RP.seed = time(NULL);
     nmaxtot = atoi(argv[3]);
-    fp = fopen("/workspaces/Computazionale2/Lab5/File/SelfAvoidingP.dat", "w+");
+    fp = fopen("/workspaces/Computazionale2/RandomWalk/File/SelfAvoidingP.dat", "w+");
     while(nmax<nmaxtot){
         tcount=0;
         for(int k=0; k<5000; k++){

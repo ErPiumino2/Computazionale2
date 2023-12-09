@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include<math.h>
 #include<time.h>
+#include<string.h>
 
 typedef struct Position{
     int x;
@@ -9,9 +10,12 @@ typedef struct Position{
 }Pos;
 
 double INVRANDMAX=1/(RAND_MAX + 1.);
-void particleposition(int** matrix, Pos* array, int L, int N);
+void particleposition(int** matrix, Pos* array, Pos* distanzaparticelle, int L, int N);
 int Check(int** reticolo, int x, int y, int L);
 double mod(double x, double m);
+double R2(Pos *distanzaparticelle, int N);
+void ClearReticolo(int** reticolo, int L);
+void ClearArray(Pos* particelle, int N);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,7 +52,7 @@ void immission_error(){
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void spawn(int** reticolo, Pos *array, int L, int N){
+void spawn(int** reticolo, Pos *array, Pos* distanzaparticelle, int L, int N){
     int n=1;
     while(n<=N){
         int x = randrange(0, L);
@@ -57,7 +61,7 @@ void spawn(int** reticolo, Pos *array, int L, int N){
             reticolo[x][y] = n++;
         }
     }
-    particleposition(reticolo, array, L, N);
+    particleposition(reticolo, array, distanzaparticelle, L, N);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,25 +86,11 @@ void printarray(Pos *array, int N){
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void move(int** reticolo, Pos* array, int* distanzaparticelle, int N, int L){
-    int i=0;
+void move(int** reticolo, Pos* array, Pos* distanzaparticelle, int N, int L){
     Pos delta, newpos;
-    while(i<N){
+    for(int i=0; i<N; i++){
         //Initializing the variables as a safety check
-        delta.x = 0;
-        delta.y = 0;
-        newpos.x = 0;
-        newpos.y = 0;
-        //Trapped Situation
-        if(
-            Check(reticolo, array[i].x+1, array[i].y, L)==0 &&
-            Check(reticolo, array[i].x-1, array[i].y, L)==0 &&
-            Check(reticolo, array[i].x, array[i].y+1, L)==0 &&
-            Check(reticolo, array[i].x, array[i].y-1, L)==0 
-        ){
-            i++; //Skip to next number, this won't move
-            continue;
-        }
+        delta.x = 0; delta.y = 0; newpos.x = 0; newpos.y = 0;
         int r = (rand()%4) + 1; //Generate number within [1;4]
         switch (r){
         case (1):
@@ -127,21 +117,14 @@ void move(int** reticolo, Pos* array, int* distanzaparticelle, int N, int L){
             array[i].x = newpos.x; //Updating positions
             array[i].y = newpos.y;
             reticolo[newpos.y][newpos.x] = i+1; //Occuping the actual spot of the particle
-            distanza[i].x += delta.x;
-            distanza[i].y += delta.y;
-            i++;
-            if(i>N){
-                break;
-            }
-        }
-        else{
-            continue;
+            distanzaparticelle[i].x += delta.x;
+            distanzaparticelle[i].y += delta.y;
         }
     }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void particleposition(int** matrix, Pos* array, int L, int N){
+void particleposition(int** matrix, Pos* array, Pos* distanzaparticelle, int L, int N){
     //Sync the array of positions with the matrix
     for (int i=0; i<L; i++){
         for(int j=0; j<L; j++){
@@ -149,6 +132,8 @@ void particleposition(int** matrix, Pos* array, int L, int N){
             if (p != 0){
                 array[p-1].x = j;
                 array[p-1].y = i;
+                distanzaparticelle[p-1].x = 0;
+                distanzaparticelle[p-1].y = 0;
             }
         }
     }
@@ -168,10 +153,24 @@ int Check(int** reticolo, int x, int y, int L){
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void Density(int** reticolo, Pos* particelle, Pos* distanzaparticelle, int Nsim, int L, int N){
+double* Density(int** reticolo, Pos* particelle, Pos* distanzaparticelle, int m, int L, int N, int Nsim, int Lmax){
+    double *avg = array(m, sizeof(double));
+    memset(avg, 0, m * sizeof(double));
     for(int i=0; i<Nsim; i++){
-        move(reticolo, particelle, distanzaparticelle, N, L);
+        ClearReticolo(reticolo, L);
+        ClearArray(distanzaparticelle, N);
+        ClearArray(particelle, N);
+        spawn(reticolo, particelle, distanzaparticelle, L, N);
+        for(int j=0; j<m; j++){
+            move(reticolo, particelle, distanzaparticelle, N, L);
+            avg[j] += R2(distanzaparticelle, N);
+            //printf("%.2lf \t", avg[j]);
+        }
     }
+    for(int i=0; i<m; i++){
+        avg[i] = avg[i]/(Nsim*4*(i));
+    }
+    return avg;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,4 +188,21 @@ double R2(Pos *distanzaparticelle, int N){
 double mod(double x, double m){
     //Compute x mod. m. Result is in [0,m)
     return fmod(fmod(x, m) + m, m);
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void ClearReticolo(int** reticolo, int L){
+    for (int i = 0; i < L; i++) {
+        for (int j = 0; j < L; j++) {
+            reticolo[i][j] = 0;
+        }
+    }
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void ClearArray(Pos* particelle, int N){
+    for(int i=0; i<N; i++){
+        particelle[i].x = 0;
+        particelle[i].y = 0;
+    }
 }
