@@ -5,24 +5,31 @@ fig, ax = plt.subplots(3,2)
 fig.set_figwidth(20)
 fig.set_figheight(20)
 fig.suptitle('Random Walk for various number of steps', fontsize=20)
-x1, y1 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/RW2Dn=10.dat', usecols=(0, 1), unpack=True)
-x2, y2 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/RW2Dn=60.dat', usecols=(0, 1), unpack=True)
-x3, y3 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/RW2Dn=360.dat', usecols=(0, 1), unpack=True)
-x4, y4 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/RW2Dn=2160.dat', usecols=(0, 1), unpack=True)
-x5, y5 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/RW2Dn=12960.dat', usecols=(0, 1), unpack=True)
-x6, y6 = np.loadtxt('/workspaces/Computazionale2/Lab5/File/RW2Dn=77760.dat', usecols=(0, 1), unpack=True)
-N1 = len(x1)
-N2 = len(x2)
-N3 = len(x3)
-N4 = len(x4)
-N5 = len(x5)
-N6 = len(x6)
-meanx1, meany1, stdx1, stdy1 = np.loadtxt("/workspaces/Computazionale2/Lab5/File/MuStdn=10.dat", usecols=(0, 1, 2, 3), unpack=True)
-meanx2, meany2, stdx2, stdy2 = np.loadtxt("/workspaces/Computazionale2/Lab5/File/MuStdn=60.dat", usecols=(0, 1, 2, 3), unpack=True)
-meanx3, meany3, stdx3, stdy3 = np.loadtxt("/workspaces/Computazionale2/Lab5/File/MuStdn=360.dat", usecols=(0, 1, 2, 3), unpack=True)
-meanx4, meany4, stdx4, stdy4 = np.loadtxt("/workspaces/Computazionale2/Lab5/File/MuStdn=2160.dat", usecols=(0, 1, 2, 3), unpack=True)
-meanx5, meany5, stdx5, stdy5 = np.loadtxt("/workspaces/Computazionale2/Lab5/File/MuStdn=12960.dat", usecols=(0, 1, 2, 3), unpack=True)
-meanx6, meany6, stdx6, stdy6 = np.loadtxt("/workspaces/Computazionale2/Lab5/File/MuStdn=77760.dat", usecols=(0, 1, 2, 3), unpack=True)
+
+x_holder = {}
+y_holder = {}
+N_holder = {}
+meanx_holder = {}
+meany_holder = {}
+stdx_holder = {}
+stdy_holder = {}
+n = 10
+
+for i in range(1, 7):
+    #Data
+    x_holder['x' + str(i)], y_holder['y' + str(i)] = np.loadtxt(f'/workspaces/Computazionale2/RandomWalk/File/RW2Dn={n}.dat', usecols=(0, 1), unpack=True)
+    N_holder['N' + str(i)] = len(x_holder['x' + str(i)])
+    meanx_holder['meanx' + str(i)], meany_holder['meany' + str(i)] = np.loadtxt(f"/workspaces/Computazionale2/RandomWalk/File/MuStdn={n}.dat", usecols=(0, 1), unpack=True)
+    stdx_holder['stdx' + str(i)], stdy_holder['stdy' + str(i)] = np.loadtxt(f"/workspaces/Computazionale2/RandomWalk/File/MuStdn={n}.dat", usecols=(2, 3), unpack=True)
+    n += 5*n
+
+locals().update(x_holder)
+locals().update(y_holder)
+locals().update(N_holder)
+locals().update(meanx_holder)
+locals().update(meany_holder)
+locals().update(stdx_holder)
+locals().update(stdy_holder)
 #Vari plot
 f1 = ax[0,0].plot(x1, y1, color='skyblue', label=f'Random Walk {N1-1:.0f} steps',  zorder=-1)
 f2 = ax[0,1].plot(x2, y2, color='skyblue', label=f'Random Walk {N2-1:.0f} steps',  zorder=-1)
@@ -66,3 +73,4 @@ for ax in ax.flat:
     ax.legend(fontsize=10)
     ax.set(xlabel='x', ylabel='y')
 plt.savefig("RandomWalk2D.png")
+plt.show()

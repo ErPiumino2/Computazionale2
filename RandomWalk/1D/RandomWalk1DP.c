@@ -43,7 +43,7 @@ void RW(int argc, char **argv){
             if(x==2){ //Going left
                 r -= 1;}
         }
-        double p = sqrt(1/(M_PI*Nsim))*exp(-((double)(r*r)) / (Nsim*1*1));
+        double p = sqrt(1/(M_PI*nmax))*exp(-((double)(r*r)) / (nmax*1*1));
         fprintf(fp, "%i %.5lf\n", r, p);
     }
     fclose(fp);
