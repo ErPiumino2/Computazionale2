@@ -24,7 +24,7 @@ int main(int argv, char *argc[]){
         "set yrange [0.077:0.078]",
         "set grid",
         "set output 'A_L.png'",
-        "end"
+        "end" 
     };
 
     FILE *gnu = popen("gnuplot -persist", "w");
