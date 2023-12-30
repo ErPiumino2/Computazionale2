@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "stdbool.h": "c",
-        "array": "c"
+        "array": "c",
+        "cmath": "cpp"
     }
 }
